@@ -1,7 +1,6 @@
 package com.example.contactsservice.Controller;
 
-
-import com.example.contactsservice.BadRequest;
+import com.example.contactsservice.Exception.BadRequest;
 import com.example.contactsservice.CommonValidator;
 import com.example.contactsservice.DTO.ContactDTO;
 import com.example.contactsservice.Entity.ContactEntity;
@@ -11,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/contacts")
 public class ContactController {
@@ -19,12 +20,8 @@ public class ContactController {
     ContactService contactService;
 
     @PostMapping
-    public ResponseEntity<ContactEntity> create(@RequestBody ContactDTO contactDTO) {
-        if (CommonValidator.validateContactDto(contactDTO)) {
-            return new ResponseEntity<>(contactService.createContact(contactDTO), HttpStatus.CREATED);
-        } else {
-            throw new BadRequest("Invalid request");
-        }
+    public ResponseEntity<ContactEntity> create(@Valid @RequestBody ContactDTO contactDTO) {
+        return new ResponseEntity<>(contactService.createContact(contactDTO), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
@@ -39,12 +36,8 @@ public class ContactController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ContactEntity> update(@RequestBody ContactDTO contactDTO, @PathVariable Long id) {
-        if (CommonValidator.validateContactDto(contactDTO)) {
-            return new ResponseEntity<>(contactService.updateContact(contactDTO, id), HttpStatus.OK);
-        } else {
-            throw new BadRequest("Invalid request");
-        }
+    public ResponseEntity<ContactEntity> update(@Valid @RequestBody ContactDTO contactDTO, @PathVariable Long id) {
+        return new ResponseEntity<>(contactService.updateContact(contactDTO, id), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

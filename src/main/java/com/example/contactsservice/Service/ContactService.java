@@ -2,7 +2,7 @@ package com.example.contactsservice.Service;
 
 import com.example.contactsservice.DTO.ContactDTO;
 import com.example.contactsservice.Entity.ContactEntity;
-import com.example.contactsservice.NotFound;
+import com.example.contactsservice.Exception.NotFound;
 import com.example.contactsservice.Repository.ContactRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,14 +28,13 @@ public class ContactService {
 
     public ContactEntity getContact(Long id) {
         ContactEntity contact = contactRepository.getById(id);
-        try {
-            if (null != contact.getFirstName()) {
-                return contact;
-            }
-            return null;
-        } catch (RuntimeException runtimeException) {
-            throw new NotFound("User doesn't exist");
+
+        if (null != contact.getFirstName()) {
+            return contact;
+        } else {
+            throw new NotFound("Contact doesn't exist");
         }
+
     }
 
     public ContactEntity updateContact(ContactDTO contactDTO, Long id) {
@@ -48,14 +47,14 @@ public class ContactService {
 
     public void deleteContact(Long id) {
         ContactEntity contact = getContact(id);
-        if (null != contact) {
-            try {
-                contactRepository.delete(contact);
-            } catch (RuntimeException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            throw new NotFound("User doesn't exist");
+        if (contact == null) {
+            throw new NotFound("Contact doesn't exist");
+        }
+        try {
+            contactRepository.delete(contact);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Unable to delete contact");
         }
     }
 
