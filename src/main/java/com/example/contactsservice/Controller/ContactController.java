@@ -23,7 +23,6 @@ public class ContactController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ContactDTO> read(@PathVariable Long id) {
-
         ContactDTO contactDTO = new ContactDTO();
         ContactEntity contactEntity = contactService.getContact(id);
         contactDTO.setId(contactEntity.getId());
