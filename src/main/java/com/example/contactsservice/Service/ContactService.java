@@ -1,6 +1,5 @@
 package com.example.contactsservice.Service;
 
-import com.example.contactsservice.BadRequest;
 import com.example.contactsservice.DTO.ContactDTO;
 import com.example.contactsservice.Entity.ContactEntity;
 import com.example.contactsservice.NotFound;
@@ -14,9 +13,17 @@ public class ContactService {
     ContactRepository contactRepository;
 
     public ContactEntity createContact(ContactDTO contactDTO) {
-        validateContactDto(contactDTO);
         ContactEntity contact = getContact(contactDTO, new ContactEntity());
-        return contactRepository.save(contact);
+        /*
+         * Get contact by phone -
+         * if not found create new contact
+         * else throw error contact already exist*/
+        if (contactRepository.getContactByPhone(contactDTO.getPhone()) == null) {
+            return contactRepository.save(contact);
+        } else {
+            throw new NotFound("Contact already exist with the phone number");
+        }
+
     }
 
     public ContactEntity getContact(Long id) {
@@ -32,7 +39,6 @@ public class ContactService {
     }
 
     public ContactEntity updateContact(ContactDTO contactDTO, Long id) {
-        validateContactDto(contactDTO);
         ContactEntity contact = getContact(id);
         contact.setFirstName(contactDTO.getFirstName());
         contact.setLastName(contactDTO.getLastName());
@@ -43,11 +49,14 @@ public class ContactService {
     public void deleteContact(Long id) {
         ContactEntity contact = getContact(id);
         if (null != contact) {
-            contactRepository.delete(contact);
+            try {
+                contactRepository.delete(contact);
+            } catch (RuntimeException e) {
+                throw new RuntimeException(e);
+            }
         } else {
             throw new NotFound("User doesn't exist");
         }
-
     }
 
     private ContactEntity getContact(ContactDTO contactDTO, ContactEntity contact) {
@@ -57,12 +66,4 @@ public class ContactService {
         return contact;
     }
 
-    private Boolean validateContactDto(ContactDTO contactDTO) {
-        if (contactDTO.getFirstName().length() < 3 || contactDTO.getLastName().length() < 3) {
-            throw new BadRequest("Name should be more than 3 characters");
-        } else if (String.valueOf(contactDTO.getPhone()).length() < 10) {
-            throw new BadRequest("Invalid phone");
-        }
-        return true;
-    }
 }

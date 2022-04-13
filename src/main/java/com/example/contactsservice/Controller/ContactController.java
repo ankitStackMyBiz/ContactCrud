@@ -1,6 +1,8 @@
 package com.example.contactsservice.Controller;
 
 
+import com.example.contactsservice.BadRequest;
+import com.example.contactsservice.CommonValidator;
 import com.example.contactsservice.DTO.ContactDTO;
 import com.example.contactsservice.Entity.ContactEntity;
 import com.example.contactsservice.Service.ContactService;
@@ -18,7 +20,11 @@ public class ContactController {
 
     @PostMapping
     public ResponseEntity<ContactEntity> create(@RequestBody ContactDTO contactDTO) {
-        return new ResponseEntity<>(contactService.createContact(contactDTO), HttpStatus.CREATED);
+        if (CommonValidator.validateContactDto(contactDTO)) {
+            return new ResponseEntity<>(contactService.createContact(contactDTO), HttpStatus.CREATED);
+        } else {
+            throw new BadRequest("Invalid request");
+        }
     }
 
     @GetMapping("/{id}")
@@ -34,7 +40,11 @@ public class ContactController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ContactEntity> update(@RequestBody ContactDTO contactDTO, @PathVariable Long id) {
-        return new ResponseEntity<>(contactService.updateContact(contactDTO, id), HttpStatus.OK);
+        if (CommonValidator.validateContactDto(contactDTO)) {
+            return new ResponseEntity<>(contactService.updateContact(contactDTO, id), HttpStatus.OK);
+        } else {
+            throw new BadRequest("Invalid request");
+        }
     }
 
     @DeleteMapping("/{id}")
