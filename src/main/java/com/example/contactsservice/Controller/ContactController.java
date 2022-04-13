@@ -1,7 +1,5 @@
 package com.example.contactsservice.Controller;
 
-import com.example.contactsservice.Exception.BadRequest;
-import com.example.contactsservice.CommonValidator;
 import com.example.contactsservice.DTO.ContactDTO;
 import com.example.contactsservice.Entity.ContactEntity;
 import com.example.contactsservice.Service.ContactService;
