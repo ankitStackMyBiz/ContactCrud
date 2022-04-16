@@ -5,10 +5,18 @@ import com.example.contactsservice.Entity.ContactEntity;
 import com.example.contactsservice.Exception.NotFound;
 import com.example.contactsservice.Repository.ContactRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class ContactService {
+
     @Autowired
     ContactRepository contactRepository;
 
@@ -23,7 +31,17 @@ public class ContactService {
         } else {
             throw new NotFound("Contact already exist with the phone number");
         }
+    }
 
+    public List<ContactEntity> getAllContacts(int pageNo, int pageSize, String sortBy) {
+
+        Pageable pageableRequest = PageRequest.of(pageNo, pageSize, Sort.by(sortBy).ascending());
+        Page<ContactEntity> allContacts = contactRepository.findAll(pageableRequest);
+        if (allContacts.hasContent()) {
+            return allContacts.getContent();
+        } else {
+            return new ArrayList<ContactEntity>();
+        }
     }
 
     public ContactEntity getContact(Long id) {

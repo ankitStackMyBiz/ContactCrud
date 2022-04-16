@@ -4,11 +4,13 @@ import com.example.contactsservice.DTO.ContactDTO;
 import com.example.contactsservice.Entity.ContactEntity;
 import com.example.contactsservice.Service.ContactService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/contacts")
@@ -42,5 +44,14 @@ public class ContactController {
     public ResponseEntity<?> delete(@PathVariable Long id) {
         contactService.deleteContact(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/getAllContacts")
+    public ResponseEntity<List<ContactEntity>> getAllContacts(@RequestParam(defaultValue = "0") Integer pageNo,
+                                                              @RequestParam(defaultValue = "5") Integer pageSize,
+                                                              @RequestParam(defaultValue = "id") String sortBy) {
+        List<ContactEntity> list = contactService.getAllContacts(pageNo, pageSize, sortBy);
+
+        return new ResponseEntity<>(list, new HttpHeaders(), HttpStatus.OK);
     }
 }
